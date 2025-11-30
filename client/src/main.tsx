@@ -8,6 +8,7 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import { AppSettingsProvider } from "@/contexts/AppSettingsContext";
 
 const queryClient = new QueryClient();
 
@@ -56,9 +57,10 @@ const trpcClient = trpc.createClient({
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
+      <AppSettingsProvider>
         <App />
-      </SidebarProvider>
+      </AppSettingsProvider>
     </QueryClientProvider>
   </trpc.Provider>
 );
+

@@ -11,7 +11,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { cn } from "@/lib/utils";
-import { t } from "@/lib/i18n";
+import { useTranslation } from "@/i18n/useTranslation";
 
 type Platform = "airbnb" | "booking" | "vrbo" | "direct";
 
@@ -83,8 +83,10 @@ const platformLabels: Record<Platform, string> = {
 
 export function MultiCalendar() {
   const { currency, locale } = useAppSettings();
+  const { t } = useTranslation();
+
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("all"); // Filtre par propriété
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("all");
 
   // Locale JS pour l'affichage des dates
   const dateLocale =
@@ -135,15 +137,23 @@ export function MultiCalendar() {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{t("reservation_calendar", locale)}</CardTitle>
+          {/* Titre : "Calendrier des réservations" */}
+          <CardTitle>{t("dashboard", "reservationCalendar")}</CardTitle>
+
           <div className="flex items-center gap-3">
             {/* Filtre par propriété */}
-            <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
-              <SelectTrigger className="w-[200px]">
+            <Select
+              value={selectedPropertyId}
+              onValueChange={setSelectedPropertyId}
+            >
+              <SelectTrigger className="w-[200px] rounded-full bg-[#163636] text-white border-transparent px-4 text-sm shadow-sm hover:bg-[#163636]/90">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t("all_properties", locale)}</SelectItem>
+                {/* "Tous les logements" */}
+                <SelectItem value="all">
+                  {t("dashboard", "allProperties")}
+                </SelectItem>
                 {mockProperties.map((property) => (
                   <SelectItem key={property.id} value={property.id}>
                     {property.name}
@@ -151,6 +161,8 @@ export function MultiCalendar() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Navigation mois précédent / suivant */}
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" onClick={goToPreviousMonth}>
                 <ChevronLeft className="h-4 w-4" />
@@ -165,13 +177,15 @@ export function MultiCalendar() {
           </div>
         </div>
       </CardHeader>
+
       <CardContent>
         <div className="overflow-x-auto">
           <div className="min-w-[1200px]">
             {/* En-tête avec les jours */}
             <div className="grid grid-cols-[200px_repeat(31,minmax(40px,1fr))] gap-px bg-[var(--nk-border)]">
               <div className="bg-[var(--nk-sand)] p-2 font-semibold">
-                {t("property", locale)}
+                {/* "Propriété" */}
+                {t("reservations", "property")}
               </div>
               {days.map((day) => (
                 <div
@@ -187,7 +201,8 @@ export function MultiCalendar() {
             {mockProperties
               .filter(
                 (property) =>
-                  selectedPropertyId === "all" || property.id === selectedPropertyId
+                  selectedPropertyId === "all" ||
+                  property.id === selectedPropertyId
               )
               .map((property) => (
                 <div
@@ -249,7 +264,9 @@ export function MultiCalendar() {
 
         {/* Légende */}
         <div className="mt-4 flex items-center gap-4 text-xs">
-          <span className="font-semibold">Plateformes :</span>
+          <span className="font-semibold">
+            {t("settings", "platforms")} :
+          </span>
           {Object.entries(platformLabels).map(([platform, label]) => (
             <div key={platform} className="flex items-center gap-2">
               <div
