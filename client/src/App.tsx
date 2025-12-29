@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { SidebarProvider } from "./contexts/SidebarContext";
@@ -16,6 +17,7 @@ import ReservationNew from "./pages/ReservationNew";
 import Tasks from "./pages/Tasks";
 import TaskNew from "./pages/TaskNew";
 import Settings from "./pages/Settings";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -43,6 +45,22 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  // P0-03: route guard minimal (redirige vers /login si non authentifié)
+  const { isAuthenticated, loading } = useSupabaseAuth();
+  const [location, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (loading) return;
+    if (isAuthenticated) return;
+    if (location === "/login") return;
+    setLocation("/login");
+  }, [isAuthenticated, loading, location, setLocation]);
+
+  // Évite de rendre des pages protégées le temps de rediriger.
+  if (!loading && !isAuthenticated && location !== "/login") {
+    return null;
+  }
+
   return (
     <ErrorBoundary>
       <ThemeProvider
